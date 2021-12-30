@@ -1,0 +1,33 @@
+[package]
+name = "dutchbucket"
+version = "0.1.1"
+authors = ["Mikko Kolehmainen"]
+edition = "2018"
+description = ""
+license = "MIT"
+
+[patch.crates-io]
+getrandom = { version = "0.2", git = "https://github.com/esp-rs-compat/getrandom.git" }
+
+[profile.release]
+opt-level = "s"
+
+[profile.dev]
+debug = true # Symbols are nice and they don't increase the size on Flash
+opt-level = "z"
+
+[features]
+native = ["esp-idf-sys/native"]
+
+[dependencies]
+anyhow = {version = "1", features = ["backtrace"]}
+log = "0.4"
+esp-idf-sys = { version = "0.28.1", features = ["binstart"] }
+embedded-svc = "0.15.4"
+esp-idf-svc = "0.34.1"
+esp-idf-hal = "0.29.3"
+embedded-hal = "0.2"
+
+[build-dependencies]
+embuild = "0.26"
+anyhow = "1"

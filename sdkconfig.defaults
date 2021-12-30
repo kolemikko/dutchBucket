@@ -1,0 +1,4 @@
+# Future: proper back-trace for esp32c3
+# CONFIG_ESP_SYSTEM_USE_EH_FRAME=y
+
+CONFIG_ETH_USE_OPENETH=y
