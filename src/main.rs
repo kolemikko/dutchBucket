@@ -2,7 +2,6 @@ use anyhow::anyhow;
 use embedded_svc::{httpd::registry::*, httpd::*, wifi::*};
 use esp_idf_svc::{httpd as idfhttpd, netif::*, nvs::EspDefaultNvs, sysloop::*, wifi::*};
 use log::*;
-use std::sync::{Condvar, Mutex};
 use std::{sync::Arc, thread, time::*};
 
 mod webconfig;
@@ -15,11 +14,8 @@ fn main() -> Result<()> {
     let sys_loop_stack = Arc::new(EspSysLoopStack::new()?);
     let default_nvs = Arc::new(EspDefaultNvs::new()?);
 
-    let wifi = wifi(netif_stack, sys_loop_stack, default_nvs)?;
-
-    let mutex = Arc::new((Mutex::new(None), Condvar::new()));
-
-    let httpd = httpd(mutex.clone())?;
+    let _wifi = wifi(netif_stack, sys_loop_stack, default_nvs)?;
+    let _httpd = httpd();
 
     loop {
         thread::sleep(Duration::from_secs(1));
@@ -35,24 +31,12 @@ fn wifi(
 ) -> Result<Box<EspWifi>> {
     let mut wifi = Box::new(EspWifi::new(netif_stack, sys_loop_stack, default_nvs)?);
 
-    info!("Wifi created, about to scan");
-
     let ap_infos = wifi.scan()?;
-
     let ours = ap_infos.into_iter().find(|a| a.ssid == webconfig::SSID);
 
     let channel = if let Some(ours) = ours {
-        info!(
-            "Found configured access point {} on channel {}",
-            webconfig::SSID,
-            ours.channel
-        );
         Some(ours.channel)
     } else {
-        info!(
-            "Configured access point {} not found during scanning, will go with unknown channel",
-            webconfig::SSID
-        );
         None
     };
 
@@ -70,8 +54,6 @@ fn wifi(
         },
     ))?;
 
-    info!("Wifi configuration set, about to get status");
-
     let status = wifi.get_status();
 
     if let Status(
@@ -87,7 +69,7 @@ fn wifi(
     Ok(wifi)
 }
 
-fn httpd(mutex: Arc<(Mutex<Option<u32>>, Condvar)>) -> Result<idfhttpd::Server> {
+fn httpd() -> Result<idfhttpd::Server> {
     let server = idfhttpd::ServerRegistry::new()
         .at("/")
         .get(|_| Ok("Yeehaa!".into()))?
