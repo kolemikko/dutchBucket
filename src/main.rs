@@ -1,5 +1,6 @@
 use anyhow::anyhow;
 use embedded_svc::{httpd::registry::*, httpd::*, wifi::*};
+use esp_idf_hal::prelude::*;
 use esp_idf_svc::{httpd as idfhttpd, netif::*, nvs::EspDefaultNvs, sysloop::*, wifi::*};
 use log::*;
 use std::{sync::Arc, thread, time::*};
@@ -16,6 +17,11 @@ fn main() -> Result<()> {
 
     let _wifi = wifi(netif_stack, sys_loop_stack, default_nvs)?;
     let _httpd = httpd();
+
+    let peripherals = Peripherals::take().unwrap();
+    let pins = peripherals.pins;
+    let mut led = pins.gpio23.into_output().unwrap();
+    led.set_high().unwrap();
 
     loop {
         thread::sleep(Duration::from_secs(1));
