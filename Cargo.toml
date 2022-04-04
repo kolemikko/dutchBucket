@@ -1,5 +1,5 @@
 [package]
-name = "dutchbucket"
+name = "esp32-xtensa-template"
 version = "0.1.1"
 authors = ["Mikko Kolehmainen"]
 edition = "2018"

@@ -7,29 +7,6 @@ use std::{sync::Arc, thread, time::*};
 
 mod webconfig;
 
-fn main() -> Result<()> {
-    esp_idf_sys::link_patches();
-    esp_idf_svc::log::EspLogger::initialize_default();
-
-    let netif_stack = Arc::new(EspNetifStack::new()?);
-    let sys_loop_stack = Arc::new(EspSysLoopStack::new()?);
-    let default_nvs = Arc::new(EspDefaultNvs::new()?);
-
-    let _wifi = wifi(netif_stack, sys_loop_stack, default_nvs)?;
-    let _httpd = httpd();
-
-    let peripherals = Peripherals::take().unwrap();
-    let pins = peripherals.pins;
-    let mut led = pins.gpio23.into_output().unwrap();
-    led.set_high().unwrap();
-
-    loop {
-        thread::sleep(Duration::from_secs(1));
-    }
-
-    Ok(())
-}
-
 fn wifi(
     netif_stack: Arc<EspNetifStack>,
     sys_loop_stack: Arc<EspSysLoopStack>,
@@ -88,4 +65,27 @@ fn httpd() -> Result<idfhttpd::Server> {
         })?;
 
     server.start(&Default::default())
+}
+
+fn main() -> Result<()> {
+    esp_idf_sys::link_patches();
+    esp_idf_svc::log::EspLogger::initialize_default();
+
+    let netif_stack = Arc::new(EspNetifStack::new()?);
+    let sys_loop_stack = Arc::new(EspSysLoopStack::new()?);
+    let default_nvs = Arc::new(EspDefaultNvs::new()?);
+
+    let _wifi = wifi(netif_stack, sys_loop_stack, default_nvs)?;
+    let _httpd = httpd();
+
+    let peripherals = Peripherals::take().unwrap();
+    let pins = peripherals.pins;
+    let mut led = pins.gpio23.into_output().unwrap();
+    led.set_high().unwrap();
+
+    loop {
+        thread::sleep(Duration::from_secs(1));
+    }
+
+    Ok(())
 }
