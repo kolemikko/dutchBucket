@@ -2,4 +2,3 @@
 /.embuild
 /target
 **/*.rs.bk
-/src/webconfig.rs

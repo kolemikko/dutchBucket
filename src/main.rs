@@ -5,8 +5,6 @@ use esp_idf_svc::{httpd as idfhttpd, netif::*, nvs::EspDefaultNvs, sysloop::*, w
 use log::*;
 use std::{sync::Arc, thread, time::*};
 
-mod webconfig;
-
 fn wifi(
     netif_stack: Arc<EspNetifStack>,
     sys_loop_stack: Arc<EspSysLoopStack>,
@@ -25,8 +23,8 @@ fn wifi(
 
     wifi.set_configuration(&Configuration::Mixed(
         ClientConfiguration {
-            ssid: webconfig::SSID.into(),
-            password: webconfig::PASS.into(),
+            ssid: "Add SSID of the network here".into(),
+            password: "Add password for network here".into(),
             channel,
             ..Default::default()
         },
